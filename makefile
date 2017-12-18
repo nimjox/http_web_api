@@ -4,7 +4,7 @@
 
 PATH_OBJ    = ./obj/
 
-CXXFLAGS += -std=c++11 -g -Wall
+CXXFLAGS += -std=c++11 -g -Wall -I helpers/
 
 NAME = apid
 LIBS = -lm -lpthread
@@ -12,7 +12,6 @@ LIBS = -lm -lpthread
 DEPEND_FILES = 
 
 DEPEND_FILES += $(PATH_OBJ)apid.o
-
 
 .PHONY: objdir 
 
