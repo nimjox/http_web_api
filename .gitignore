@@ -1,0 +1,6 @@
+*.creator*
+*.files
+*.includes
+*.config
+obj
+apid
