@@ -15,7 +15,9 @@
 #include <unistd.h>
 #include <poll.h>
 
-#include <errors.h>
+#include <workers/example.h>
+#include <helpers/aliases.h>
+#include <helpers/errors.h>
 
 /*** Program global settings ***/
 #define RECV_SOCKET_IP "127.0.0.1"
@@ -23,12 +25,6 @@
 
 static bool shutdown_requested = false;
 /*** End Program global settings ***/
-
-
-/*** Aliases ***/
-typedef std::pair<std::string, std::string> STRING_PAIR;
-typedef std::forward_list<STRING_PAIR>      STRING_PAIR_LINKED_LIST;
-/*** End Aliases ***/
 
 
 /*** Signal Helpers ***/
@@ -167,6 +163,9 @@ int parseRequestQuery (const std::string& query_string, STRING_PAIR_LINKED_LIST&
                 if (key == "_")
                     continue;
 
+                fprintf (stderr, SD_INFO "param - key:%s, value:%s\n",
+                         key.c_str(), val.c_str());
+
                 STRING_PAIR key_value;
                 key_value.first = key;
                 key_value.second = val;
@@ -177,10 +176,6 @@ int parseRequestQuery (const std::string& query_string, STRING_PAIR_LINKED_LIST&
         fprintf (stderr, SD_INFO "protocol:%s\n", protocol.c_str ());
         fprintf (stderr, SD_INFO "method:%s\n", method.c_str ());
         fprintf (stderr, SD_INFO "url:%s\n", url.c_str ());
-
-        for(auto const& param: params)
-            fprintf (stderr, SD_INFO "param - key:%s, value:%s\n",
-                     param.first.c_str(), param.second.c_str());
     }
     catch (...) {
         fprintf (stderr, SD_ERR "ERROR: http string malformated\n");
@@ -258,13 +253,16 @@ void processRequest (const int& fd)
     //    sendReplyError ();
 
     //std::string result;
-    //process_request_helper(get, request_string, result);
 
-    //Send the doctype XML header and the body of the XML response.
-    //std::string doctype =
-    //"HTTP/1.1 200 OK\nContent-Type: text\ncharset=UTF-8\nConnection: close\r\n\r\n";
-    //send(fd, doctype.c_str(), doctype.length(), 0);
-    //send(fd, result.c_str(), result.size(), 0);
+    // Send key/value to be processed by worker function. Worker function should build a string
+    // that will be sent back on the socket as the response. Ie. the worker can get/set items
+    // and then return with json/xml/etc of execution status.
+    std::string result;
+    for(auto const& param: params)
+        result += doApiWork (param.first, param.second);
+
+    // Send the API resonse string back to the caller
+    send(fd, result.c_str(), result.size(), 0);
 
     shutdownTcpSocket (fd);
 }
