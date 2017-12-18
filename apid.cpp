@@ -179,7 +179,8 @@ int parseRequestQuery (const std::string& query_string, STRING_PAIR_LINKED_LIST&
         fprintf (stderr, SD_INFO "url:%s\n", url.c_str ());
 
         for(auto const& param: params)
-            fprintf (stderr, SD_INFO "param - key:%s, value:%s\n", param.first.c_str(), param.second.c_str());
+            fprintf (stderr, SD_INFO "param - key:%s, value:%s\n",
+                     param.first.c_str(), param.second.c_str());
     }
     catch (...) {
         fprintf (stderr, SD_ERR "ERROR: http string malformated\n");
@@ -260,7 +261,8 @@ void processRequest (const int& fd)
     //process_request_helper(get, request_string, result);
 
     //Send the doctype XML header and the body of the XML response.
-    //std::string doctype = "HTTP/1.1 200 OK\nContent-Type: text/xml\ncharset=UTF-8\nConnection: close\r\n\r\n";
+    //std::string doctype =
+    //"HTTP/1.1 200 OK\nContent-Type: text\ncharset=UTF-8\nConnection: close\r\n\r\n";
     //send(fd, doctype.c_str(), doctype.length(), 0);
     //send(fd, result.c_str(), result.size(), 0);
 
